@@ -7,8 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: your_password  # Set the root password only
       MYSQL_DATABASE: getnews  # Optional: Create the 'getnews' database on startup
-    ports:
-      - "3306:3306"
+    network_mode: host
+    restart: always  # Add restart policy
     volumes:
       - ./mysql_data:/var/lib/mysql
 

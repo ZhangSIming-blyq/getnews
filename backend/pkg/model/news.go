@@ -26,10 +26,11 @@ func NewNewsModel(db *gorm.DB) *NewsModel {
 	return &NewsModel{db: db}
 }
 
-// GetLatestBySource fetches the latest news from a specific source
+// GetLatestBySource fetches the latest news from a specific source, ordered by Rank in descending order
 func (m *NewsModel) GetLatestBySource(source string, limit int) ([]News, error) {
 	var news []News
-	err := m.db.Where("source = ?", source).Order("created_at desc").Limit(limit).Find(&news).Error
+	// Order by Rank in descending order
+	err := m.db.Table("news").Where("source = ?", source).Order("`rank` ASC").Limit(limit).Find(&news).Error
 	return news, err
 }
 

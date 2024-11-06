@@ -6,18 +6,25 @@ import (
 	"getnews/pkg/model"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 // FetchWeiboHot fetches and parses Weibo hot search data into model.News format
 func FetchWeiboHot() ([]model.News, error) {
-	// Define the Weibo API URL or endpoint
-	url := "https://weibo.com/ajax/side/hotSearch" // Replace with the actual API URL
+	weiboUrl := "https://weibo.com/ajax/side/hotSearch"
 
-	// Make the HTTP GET request
-	resp, err := http.Get(url)
+	// 创建请求
+	req, err := http.NewRequest("GET", weiboUrl, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch Weibo hot search: %v", err)
+		fmt.Printf("Error creating request: %v\n", err)
+	}
+
+	// 发送请求
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error making request: %v\n", err)
 	}
 	defer resp.Body.Close()
 
@@ -54,10 +61,14 @@ func FetchWeiboHot() ([]model.News, error) {
 		if item.Link == "" {
 			continue
 		}
+		encodedQuery := url.QueryEscape(item.Link)
+		baseURL := "https://s.weibo.com/weibo"
+		finalURL := fmt.Sprintf("%s?q=%s&typeall=1&suball=1&Refer=g", baseURL, encodedQuery)
 		newsList = append(newsList, model.News{
-			Title:     item.Word,
-			Link:      item.Link,
-			Rank:      item.Rank,
+			Title: item.Word,
+			Link:  finalURL,
+			// 因为微博的排序是从0开始的
+			Rank:      item.Rank + 1,
 			Source:    "Weibo",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),

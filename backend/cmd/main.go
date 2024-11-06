@@ -57,7 +57,7 @@ func main() {
 	}
 	c.Start()
 
-	// 设置路由
+	// 设置路由, 监听到0.0.0.0:8080
 	r := gin.Default()
 
 	// CORS 中间件
@@ -68,7 +68,7 @@ func main() {
 	r.POST("/api/news/refresh", controller.RefreshNewsList)
 
 	// 启动服务器
-	addr := fmt.Sprintf(":%d", cfg.Server.Port)
+	addr := fmt.Sprintf("0.0.0.0:%d", cfg.Server.Port)
 	if err := r.Run(addr); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
