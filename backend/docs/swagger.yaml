@@ -1,0 +1,273 @@
+basePath: /api
+definitions:
+  model.Article:
+    properties:
+      content:
+        description: Article Content
+        type: string
+      course_id:
+        description: Foreign key to Course
+        type: integer
+      created_at:
+        description: Created Time
+        type: string
+      id:
+        description: Unsigned bigint
+        type: integer
+      title:
+        description: Article Title
+        type: string
+      updated_at:
+        description: Updated Time
+        type: string
+    type: object
+  model.Course:
+    properties:
+      articles:
+        description: One-to-many relationship
+        items:
+          $ref: '#/definitions/model.Article'
+        type: array
+      created_at:
+        description: Created Time
+        type: string
+      description:
+        description: Course Description
+        type: string
+      id:
+        description: Unsigned bigint
+        type: integer
+      title:
+        description: Unique Title
+        type: string
+      updated_at:
+        description: Updated Time
+        type: string
+    type: object
+  model.News:
+    description: 新闻
+    properties:
+      created_at:
+        type: string
+      link:
+        type: string
+      rank:
+        type: integer
+      source:
+        description: Source means different news sources, such as Weibo, Zhihu, etc.
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://example.com/support
+  description: This API provides endpoints to manage news and courses.
+  title: News and Courses API
+  version: "1.0"
+paths:
+  /articles:
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的文章
+      parameters:
+      - description: 文章信息
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/model.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 创建新文章
+      tags:
+      - articles
+  /articles/{id}:
+    get:
+      description: 根据文章ID获取文章详细信息
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Article'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取文章详情
+      tags:
+      - articles
+  /courses:
+    get:
+      description: 获取所有课程
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Course'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取课程列表
+      tags:
+      - courses
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的课程
+      parameters:
+      - description: 课程信息
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/model.Course'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 创建新课程
+      tags:
+      - courses
+  /courses/{id}:
+    get:
+      description: 根据课程ID获取课程详细信息
+      parameters:
+      - description: 课程ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Course'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取课程详情
+      tags:
+      - courses
+  /news:
+    get:
+      consumes:
+      - application/json
+      description: 获取新闻列表
+      parameters:
+      - description: 新闻来源
+        in: query
+        name: source
+        type: string
+      - description: 数量
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.News'
+            type: array
+      summary: 获取新闻列表
+      tags:
+      - news
+  /news/refresh:
+    post:
+      description: 强制刷新新闻数据
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 刷新新闻列表
+      tags:
+      - news
+swagger: "2.0"

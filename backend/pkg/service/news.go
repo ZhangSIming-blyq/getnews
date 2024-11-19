@@ -6,10 +6,12 @@ import (
 )
 
 var newsModel *model.NewsModel
+var courseModel *model.CourseModel
 
 // InitService Initialize the service with a database connection
 func InitService(db *gorm.DB) {
 	newsModel = model.NewNewsModel(db)
+	courseModel = model.NewCourseModel(db)
 }
 
 // GetLatestNews 获取最新新闻

@@ -5,7 +5,8 @@ import (
 	"time"
 )
 
-// News represents the news model
+// News represents a news item
+// @Description 新闻
 type News struct {
 	Title string `gorm:"not null" json:"title"`
 	Link  string `gorm:"not null" json:"link"`

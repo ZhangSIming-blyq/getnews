@@ -1,13 +1,24 @@
+// @title			News and Courses API
+// @version		1.0
+// @description	This API provides endpoints to manage news and courses.
+// @contact.name	API Support
+// @contact.url	http://example.com/support
+// @contact.email	support@example.com
+// @host			localhost:8080
+// @BasePath		/api
 package main
 
 import (
 	"fmt"
+	_ "getnews/docs"
 	"getnews/pkg/config"
 	"getnews/pkg/controller"
 	"getnews/pkg/model"
 	"getnews/pkg/service"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -17,10 +28,18 @@ import (
 // CORS middleware
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-		if c.Request.Method == "OPTIONS" {
+		// 允许所有域
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		// 允许所有方法
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "*")
+		// 允许所有头
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "*")
+		// 允许cookie
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		// 预检请求有效期
+		c.Writer.Header().Set("Access-Control-Max-Age", "3600")
+		// 继续处理请求
+		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
@@ -39,6 +58,8 @@ func main() {
 
 	// 初始化模型和服务
 	model.NewNewsModel(db)
+	model.NewCourseModel(db)
+
 	service.InitService(db)
 	// 立刻刷新新闻一次
 	service.RefreshNews()
@@ -66,6 +87,19 @@ func main() {
 	// API 路由
 	r.GET("/api/news", controller.GetNewsList)
 	r.POST("/api/news/refresh", controller.RefreshNewsList)
+	// 获取所有课程
+	r.GET("/api/courses", controller.GetCourses)
+	// 获取指定课程
+	r.GET("/api/courses/:id", controller.GetCourseByID)
+	// 创建新课程
+	r.POST("/api/courses", controller.CreateCourse)
+	// 创建新文章
+	r.POST("/api/articles", controller.CreateArticle)
+	// 获取指定文章
+	r.GET("/api/articles/:id", controller.GetArticleByID)
+
+	// Swagger
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 启动服务器
 	addr := fmt.Sprintf("0.0.0.0:%d", cfg.Server.Port)
@@ -81,7 +115,7 @@ func initDB() *gorm.DB {
 	}
 
 	// 自动迁移数据库
-	if err := db.AutoMigrate(&model.News{}); err != nil {
+	if err := db.AutoMigrate(&model.News{}, &model.Course{}, &model.Article{}); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
