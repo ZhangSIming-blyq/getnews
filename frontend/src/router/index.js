@@ -1,16 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import NewsBoard from '../views/NewsBoard.vue'
+import News from '../views/News.vue'
+import LandingPage from '../views/LandingPage.vue'
+import Course from '../views/Course.vue'
+import Article from '../views/Article.vue'
+import CourseDetail from '../views/CourseDetail.vue'
 
 const routes = [
   {
-    path: '/news-board',
-    name: 'NewsBoard',
-    component: NewsBoard,
-    meta: {
-      title: '新闻看板'
-    }
+    path: '/news',
+    name: 'News',
+    component: News,
+  },
+  {
+    path: '/',
+    name: 'LandingPage',
+    component: LandingPage,
+  },
+  {
+    path: '/courses',
+    name: 'Course',
+    component: Course,
+  },
+  {
+    path: '/article/:id',
+    name: 'Article',
+    component: Article,
+    props: true
+  },
+  {
+    path: '/course/:id',
+    name: 'CourseDetail',
+    component: CourseDetail,
+    props: true
   }
-  // ... 其他路由
 ]
 
 const router = createRouter({
